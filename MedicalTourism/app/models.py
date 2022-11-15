@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Patient(models.Model):
-    id = models.AutoField(primary_key=True)
+    p_id = models.IntegerField(primary_key=True, default=0)
     name = models.CharField(max_length=100)
     age = models.IntegerField()
     phone = models.IntegerField()
@@ -10,7 +10,7 @@ class Patient(models.Model):
     city = models.CharField(max_length=500)
 
     def __str__ (self):
-        return str(self.id) + '. ' + str(self.name)
+        return str(self.p_id) + '. ' + str(self.name)
 
 class Disease(models.Model):
     id = models.AutoField(primary_key=True)
