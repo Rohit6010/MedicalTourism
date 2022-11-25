@@ -21,6 +21,11 @@ def index(request):
 def signin(request):
     return render(request, 'Auth/signin.html')
 
+
+def signout(request):
+    logout(request)
+    return redirect('/')
+
 def handleSignin(request):
     if request.method == "POST":
         loginusername = request.POST['loginusername']
@@ -66,3 +71,13 @@ def handleSignup(request):
         messages.success(request, " Your medical tourism account has been successfully created")
         return redirect('/')
     return render(request,'open.html')
+
+
+
+def input(request):
+    return render(request, 'input.html')
+
+
+def handleInput(request):
+    if request.method == "POST":
+       return HttpResponse("Query submitted")
