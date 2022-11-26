@@ -73,11 +73,11 @@ def handleSignup(request):
     return render(request,'open.html')
 
 
-
 def input(request):
     return render(request, 'input.html')
 
 
 def handleInput(request):
     if request.method == "POST":
+
        return HttpResponse("Query submitted")
