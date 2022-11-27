@@ -10,5 +10,7 @@ urlpatterns = [
     path('signup/', views.signup, name="signup"),
     path('handleSignup/', views.handleSignup, name="handleSignup"),
     path('input/', views.input, name="input"),
-    path('handleInput/', views.handleInput, name="handleInput"),
+    path('graph/', views.graph, name="graph"),
+    path('mapModule/<str:location>', views.mapModule, name="mapModule"),
+    path('display/<str:sortedloc>', views.displayPlaces, name="displayPlaces"),
 ]
