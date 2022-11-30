@@ -20,3 +20,19 @@ class Disease(models.Model):
     def __str__ (self):
         return str(self.kg_id) + '. ' + str(self.disease_name)
 
+
+class Temp_info_1(models.Model):
+    city = models.CharField(max_length=100, default = '')
+    distance = models.CharField(max_length=100, default = '')
+    time = models.CharField(max_length=100, default = '')
+    
+    def __str__ (self):
+        return str(self.city)
+
+
+class Temp_info(models.Model):
+    city_info = models.CharField(max_length=100, default = '')
+    price_info = models.CharField(max_length=100, default = '')
+    
+    def __str__ (self):
+        return str(self.city_info)

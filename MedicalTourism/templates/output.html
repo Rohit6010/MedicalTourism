@@ -71,8 +71,17 @@
     </nav>
 
     <div class="ml-16 mr-16 mt-8 p-4 rounded-md border-solid border-2 bg-gray-100">
-        <h1 class="text-left text-4xl pl-4 text-gray-600 font-mono font-bold"> <i class="fa-solid fa-city ml-1 text-gray-600" style="font-size: 2rem;"></i> {{location}} <i class="fa-solid fa-indian-rupee-sign ml-4 text-gray-600" style="font-size: 2rem;"></i> <span>10000</span> </h1>
-    
+        <h1 class="text-left text-4xl pl-4 text-gray-600 font-bold" style="display :inline"> <i class="fa-solid fa-city ml-1 text-gray-600" style="font-size: 2rem;"></i> {{location}} </h1>   
+        <button class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-full ml-4">
+            Treatment Cost : <i class="fa-solid fa-indian-rupee-sign ml-2 mr-2"></i> {{price}}
+        </button>
+        <button class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-full ml-4">
+            Distance : {{distance}}
+        </button>
+        <button class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-full ml-4">
+            Time : <i class="fa-solid fa-train-subway ml-2 mr-2"></i> {{time}}
+        </button>
+        
         <div class="mt-8 grid grid-cols-3 pl-4 pr-4 pb-8">
             {% for address, name, rating in  result%}
                 <div class="hover:transition transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300 mb-8">
@@ -82,7 +91,7 @@
                             <div class="p-4 bg-gray-100"><p class="text-gray-700 text-base">{{address}}</p></div>
                         </div>
                         <div class="flex items-center text-left p-3">
-                            <button class="bg-teal-500 hover:bg-teal-700 text-white py-2 px-2 border border-blue-700 rounded">
+                            <button class="bg-teal-500 hover:bg-teal-700 text-white py-2 px-2 rounded-full">
                                 Rating : {{rating}} <i class="fa-solid fa-star" style="font-size: 0.8rem; color: antiquewhite;"></i>
                             </button>
                         </div>

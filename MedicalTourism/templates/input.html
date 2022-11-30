@@ -69,22 +69,34 @@
       <i class="fa-solid  fa-heart-pulse text-teal-500 hover:text-teal-600 " style="font-size:3rem; margin : 0 0 5% 45%"></i>
       <form method="post" action="/graph/">{% csrf_token %}
         <div class="form-group mb-6">
-              <input type="text" name = "disease" class="form-control
-              block
-              w-full
-              px-3
-              py-1.5
-              text-base
-              font-normal
-              text-gray-700
-              bg-white bg-clip-padding
-              border border-solid border-gray-300
-              rounded
-              transition
-              ease-in-out
-              m-0
-              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="exampleInput123"
-              aria-describedby="emailHelp123" placeholder="Disease">
+            <select name="disease" id="cars"  class="form-control
+            block
+            w-full
+            px-3
+            py-1.5
+            text-base
+            font-normal
+            text-gray-700
+            bg-white bg-clip-padding
+            border border-solid border-gray-300
+            rounded
+            transition
+            ease-in-out
+            m-0
+            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" placeholder="Disease">
+              <option value="Cataract (Unifocal Lens) Surgery">Cataract (Unifocal Lens) Surgery</option>
+              <option value="Cataract (Multifocal Lens) Surgery">Cataract (Multifocal Lens) Surgery</option>
+              <option value="Kidney Dialysis">Kidney Dialysis</option>
+              <option value="Cystoscopy URS Surgery">Cystoscopy URS Surgery</option>
+              <option value="CABG (Bypass) Surgery">CABG (Bypass) Surgery</option>
+              <option value="Coronary Angiography (CAG)">Coronary Angiography (CAG)</option>
+              <option value="Tonsillectomy (Tonsil Removal) Surgery">Tonsillectomy (Tonsil Removal) Surgery</option>
+              <option value="Septoplasty (Nose) Surgery">Septoplasty (Nose) Surgery</option>
+              <option value="Appendicitis Surgery">Appendicitis Surgery</option>
+              <option value="Gall Bladder Removal">Gall Bladder Removal</option>
+              <option value="Knee Replacement Surgery">Knee Replacement Surgery</option>
+              <option value="Knee Ligament">Knee Ligament</option>
+            </select>
         </div>
         <div class="form-group mb-6">
           <input type="text" name = "budget" class="form-control block
