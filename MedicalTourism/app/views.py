@@ -85,17 +85,27 @@ def graph(request):
        budget = request.POST['budget']
        city = request.POST['city']
        print(city)
+ 
+       #Delete records of previous query from Temp_info table
+       Temp_info.objects.all().delete()
 
-
-       #traverse knowledge graph to find locations where disease is treated with in budget.
+       #Traverse knowledge graph to find locations where disease is treated with in budget.
        uri = "neo4j+s://644b1253.databases.neo4j.io" 
        user = "neo4j"
        password = "MCeuOS4sfD2RnrMZ3Qa3Q1on8NciRV_9ueu5Igu1eGA"
        app = App(uri, user, password)
-       topics = app._returnCitiesUnderBudget(3.1, budget)
 
-       print(topics)
-       locations = '+'.join(topics)
+       kg_id = Disease.objects.get(disease_name = disease).kg_id
+       cities = app._returnCitiesUnderBudget(kg_id, budget)
+
+       #Save city name and it's max treatment price temporarily in database
+       for ind in range(len(cities[0])):
+         info = Temp_info(city_info = cities[0][ind], price_info = cities[1][ind])
+         info.save()
+
+
+       print(cities[0])
+       locations = '+'.join(cities[0])
        if len(locations) == 0:
          return render(request, "oops.html")
 
@@ -107,6 +117,10 @@ def mapModule(request, location):
     #Googlemaps
     maps_api_key = 'AIzaSyB4s3s2DGxNxc7Inl12jxHrExJIHoyZIrw'
     gmaps = googlemaps.Client(key=maps_api_key)
+
+
+    #Delete records of previous query from Temp_info_1 table
+    Temp_info_1.objects.all().delete()
 
     #Sorting locations based on distance using geolocation API and storing in pair
     locations = location.split('+')
@@ -122,6 +136,10 @@ def mapModule(request, location):
 
         # Printing the result
         print(locations[ind], my_dist['distance']['value'])
+
+        #Storing result temporarily in database
+        info = Temp_info_1(city = dest_city, distance = my_dist['distance']['text'], time = my_dist['duration']['text'])
+        info.save()
 
         #add to dictionary
         pair[locations[ind]] = my_dist['distance']['value'] 
@@ -152,6 +170,10 @@ def displayPlaces(request, sortedloc):
     # Locate Hospitals and Doctors using places API.
     disease = sortedLocs[-1]
     location = sortedLocs[display+1]
+
+    #Getting price for requested location and deleting temporary objects
+    price = Temp_info.objects.get(city_info = location).price_info
+    
     url = f"https://maps.googleapis.com/maps/api/place/textsearch/json?query=Hospitals For {disease}%20in%20{location}&key=AIzaSyB4s3s2DGxNxc7Inl12jxHrExJIHoyZIrw"
 
     payload={}
@@ -163,42 +185,20 @@ def displayPlaces(request, sortedloc):
     for dics in json.loads(response.text)['results'] :
         result.append((dics['formatted_address'], dics['name'], dics['rating']))
 
-
+    #Sort tuple based on rating in reverse order :
+    result = sorted(result, key = lambda x: x[2], reverse=True)
 
     print(sortedLocs)
     countlist = []
     for ind in range(count):
        countlist.append(ind+1) 
 
-    # result = [
-    #     ("Department of Orthopaedic, Room NO- 1218A, Sir Ganga Ram Hospital", 
-    #     "Dr D K Dhiraj (Sir Ganga Ram Hospital), Best Orthopaedic Surgeon Delhi, knee specilaist", 
-    #     4.9,
-    #     ),
-    #     ("Department of Orthopaedic, Room NO- 1218A, Sir Ganga Ram Hospital", 
-    #     "Dr D K Dhiraj", 
-    #     4.9,
-    #     ),
-    #     ("Department of Orthopaedic, Room NO- 1218A, Sir Ganga Ram Hospital", 
-    #     "Dr D K Dhiraj", 
-    #     4.9,
-    #     ),
-    #     ("Department of Orthopaedic, Room NO- 1218A, Sir Ganga Ram Hospital", 
-    #     "Dr D K Dhiraj", 
-    #     4.9,
-    #     ),
-    #     ("Department of Orthopaedic, Room NO- 1218A, Sir Ganga Ram Hospital", 
-    #     "Dr D K Dhiraj", 
-    #     4.9,
-    #     ),
-    #     ("Department of Orthopaedic, Room NO- 1218A, Sir Ganga Ram Hospital", 
-    #     "Dr D K Dhiraj", 
-    #     4.9,
-    #     )
 
-    #     ]
+    #Get distance and duration for city
+    distance = Temp_info_1.objects.get(city=location).distance
+    time = Temp_info_1.objects.get(city=location).time
 
-    return render(request, 'output.html', {'sortedloc' : sortedloc[2:], 'countlist':countlist, 'location': sortedLocs[display + 1].capitalize(), 'result' : result})
+    return render(request, 'output.html', {'sortedloc' : sortedloc[2:], 'countlist':countlist, 'location': sortedLocs[display + 1].capitalize(), 'result' : result, 'price':price, 'distance':distance, 'time':time})
     
 
 
@@ -214,11 +214,19 @@ class App:
 
     def _returnCitiesUnderBudget(self,nodeid,budget):
         with self.driver.session() as session:
-            result = session.read_transaction(self._returnCities,nodeid,budget)
+            result1 = session.read_transaction(self._returnCities,nodeid,budget)
+            result2 = session.read_transaction(self._returnPrice,nodeid,budget)
             cities = []
-            for row in result:
+            prices = []
+            for row in result1:
                 cities.append("{row}".format(row=row))
-            return cities
+
+            for row in result2:
+                prices.append("{row}".format(row=row))
+            answer = []
+            answer.append(cities)
+            answer.append(prices)
+            return answer
 
     @staticmethod
     def _returnCities(tx,nodeid,budget):
@@ -227,3 +235,11 @@ class App:
         ) 
          result = tx.run(query, nodeid=nodeid,budget=budget)
          return [row["name"] for row in result]
+
+    @staticmethod
+    def _returnPrice(tx,nodeid,budget):
+         query = (
+            "MATCH (l:Loc) WHERE l.maxPrice <= {budget} AND l.parent_id={nodeid} RETURN l.maxPrice AS price".format(budget=budget, nodeid=nodeid)
+        ) 
+         result = tx.run(query, nodeid=nodeid,budget=budget)
+         return [row["price"] for row in result]
